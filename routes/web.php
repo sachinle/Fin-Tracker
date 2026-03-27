@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 */
 
 // Redirect root → login (better UX)
+Route::get('/', fn() => redirect()->route('login'));// Redirect root → login (better UX)
 Route::get('/', fn() => redirect()->route('login'));
 
 /*
