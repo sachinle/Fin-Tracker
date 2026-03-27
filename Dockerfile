@@ -33,10 +33,4 @@ EXPOSE 10000
 # Start Laravel
 # CMD php artisan config:clear && php artisan storage:link || true && php artisan migrate --force && php artisan serve --host 0.0.0.0 --port 10000
 
-CMD php artisan config:clear && \
-    php artisan cache:clear && \
-    php artisan view:clear && \
-    php artisan route:clear && \
-    php artisan storage:link || true && \
-    php artisan migrate --force && \
-    php artisan serve --host 0.0.0.0 --port 10000
+CMD php artisan optimize:clear && php artisan storage:link || true && php artisan migrate --force && php artisan serve --host 0.0.0.0 --port 10000

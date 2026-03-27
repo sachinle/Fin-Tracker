@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'FinTrack — Income Dashboard')</title>
-
+    
     {{-- SVG Favicon — inline data URI, no CDN needed --}}
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300d68f'/><path d='M8 22 L13 15 L18 18 L24 10' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/><circle cx='24' cy='10' r='2' fill='white'/></svg>" />
 
@@ -20,6 +21,8 @@
 
     {{-- Chart.js --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         /* =============================================
