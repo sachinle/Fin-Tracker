@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('monthly_records', function (Blueprint $table) {
             $table->id();                                          // Auto-increment primary key
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();  // Link to users table
             $table->string('month');                               // e.g., "January 2024"
             $table->decimal('income', 12, 2);                     // Total monthly income
             $table->decimal('loan', 12, 2)->default(0);           // Monthly EMI / Loan amount

@@ -14,9 +14,9 @@ class IncomeController extends Controller
 
     public function dashboard()
     {
-        $latest     = MonthlyRecord::latest()->first();
-        $records    = MonthlyRecord::latest()->take(5)->get();  // recent table
-        $allRecords = MonthlyRecord::latest()->get();           // JS chart switching
+        $latest     = MonthlyRecord::where('user_id', auth()->id())->latest()->first();
+        $records    = MonthlyRecord::where('user_id', auth()->id())->latest()->take(5)->get();  // recent table
+        $allRecords = MonthlyRecord::where('user_id', auth()->id())->latest()->get();           // JS chart switching
 
         // Prepare data for JavaScript charts
         $allRecordsForJs = $allRecords->map(fn($r) => [
@@ -33,11 +33,11 @@ class IncomeController extends Controller
         //   Total Income   = sum of all income fields
         //   Total Savings  = sum of auto-calculated savings (income - all deductions)
         //   Total Expenses = sum of loan + expenses + miscellaneous (all actual outflows)
-        $totalIncome   = MonthlyRecord::sum('income');
-        $totalSavings  = MonthlyRecord::sum('savings');
-        $totalExpenses = MonthlyRecord::selectRaw('SUM(loan + expenses + miscellaneous) as total')
+        $totalIncome   = MonthlyRecord::where('user_id', auth()->id())->sum('income');
+        $totalSavings  = MonthlyRecord::where('user_id', auth()->id())->sum('savings');
+        $totalExpenses = MonthlyRecord::where('user_id', auth()->id())->selectRaw('SUM(loan + expenses + miscellaneous) as total')
                              ->value('total') ?? 0;
-        $totalCount    = MonthlyRecord::count();
+        $totalCount    = MonthlyRecord::where('user_id', auth()->id())->count();
 
         return view('dashboard', compact(
             'latest', 'records', 'allRecords', 'allRecordsForJs',
@@ -81,6 +81,7 @@ class IncomeController extends Controller
         $validated['savings']           = $savings;
         $validated['remaining_balance'] = $savings; // kept in sync
 
+        $validated['user_id'] = auth()->id();
         MonthlyRecord::create($validated);
 
         return redirect()->route('dashboard')
@@ -93,7 +94,7 @@ class IncomeController extends Controller
 
     public function show($id)
     {
-        $record = MonthlyRecord::findOrFail($id);
+        $record = MonthlyRecord::where('user_id', auth()->id())->findOrFail($id);
         return view('income.show', compact('record'));
     }
 
@@ -103,7 +104,7 @@ class IncomeController extends Controller
 
     public function edit($id)
     {
-        $record = MonthlyRecord::findOrFail($id);
+        $record = MonthlyRecord::where('user_id', auth()->id())->findOrFail($id);
         return view('income.edit', compact('record'));
     }
 
@@ -114,7 +115,7 @@ class IncomeController extends Controller
 
     public function update(Request $request, $id)
     {
-        $record = MonthlyRecord::findOrFail($id);
+        $record = MonthlyRecord::where('user_id', auth()->id())->findOrFail($id);
 
         $validated = $request->validate([
             'month'         => 'required|string|max:50',
@@ -145,7 +146,7 @@ class IncomeController extends Controller
 
     public function destroy($id)
     {
-        MonthlyRecord::findOrFail($id)->delete();
+        MonthlyRecord::where('user_id', auth()->id())->findOrFail($id)->delete();
 
         return redirect()->route('history')
             ->with('success', 'Record deleted successfully!');
@@ -157,7 +158,7 @@ class IncomeController extends Controller
 
     public function history()
     {
-        $records = MonthlyRecord::latest()->paginate(10);
+        $records = MonthlyRecord::where('user_id', auth()->id())->latest()->paginate(10);
         return view('income.history', compact('records'));
     }
 }

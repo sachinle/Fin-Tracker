@@ -43,5 +43,11 @@
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
+
+        <div style="margin-top:15px; text-align:center;">
+    <a href="{{ route('register') }}" style="color:#4f8ef7; font-weight:500;">
+        Create an account
+    </a>
+</div>
     </form>
 </x-guest-layout>

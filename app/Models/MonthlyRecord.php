@@ -23,6 +23,7 @@ class MonthlyRecord extends Model
      * It exists for backward compatibility only.
      */
     protected $fillable = [
+        'user_id',
         'month',
         'income',
         'loan',
@@ -40,6 +41,14 @@ class MonthlyRecord extends Model
         'savings'           => 'decimal:2',
         'remaining_balance' => 'decimal:2',
     ];
+
+    /**
+     * Relationship: Monthly record belongs to a User.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * Calculate net savings — the only correct definition.
