@@ -351,7 +351,88 @@
             font-size: 13px; font-weight: 700; color: #fff;
             cursor: pointer;
             flex-shrink: 0;
+            user-select: none;
         }
+
+        /* ── User Dropdown ── */
+        .user-menu-wrap { position: relative; }
+
+        .user-menu-trigger {
+            display: flex; align-items: center; gap: 9px;
+            cursor: pointer;
+            padding: 4px 8px 4px 4px;
+            border-radius: 30px;
+            border: 1px solid transparent;
+            transition: all var(--transition);
+        }
+        .user-menu-trigger:hover {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+        }
+        .user-menu-trigger .user-name {
+            font-size: 12.5px; font-weight: 600;
+            color: var(--text-primary);
+            max-width: 120px; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .user-menu-trigger .chevron {
+            color: var(--text-muted);
+            transition: transform 0.25s ease;
+            flex-shrink: 0;
+        }
+        .user-menu-wrap.open .chevron { transform: rotate(180deg); }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px); right: 0;
+            width: 220px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 6px;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(-8px) scale(0.97);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .user-menu-wrap.open .user-dropdown {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+        .user-dropdown-header {
+            padding: 10px 12px 9px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 5px;
+        }
+        .user-dropdown-header .ud-name {
+            font-size: 13px; font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .user-dropdown-header .ud-email {
+            font-size: 11px; color: var(--text-muted);
+            font-family: var(--font-mono);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .ud-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted); text-decoration: none;
+            font-size: 13px; font-weight: 500;
+            transition: all var(--transition);
+            cursor: pointer; width: 100%;
+            background: none; border: none;
+            text-align: left; font-family: var(--font-main);
+        }
+        .ud-item:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .ud-divider { height: 1px; background: var(--border-color); margin: 4px 0; }
+        .ud-item.logout { color: var(--accent-red); }
+        .ud-item.logout:hover { background: rgba(248,113,113,0.08); color: var(--accent-red); }
 
         .sidebar-toggle {
             display: none;
@@ -885,7 +966,51 @@
                     <div class="toggle-thumb"></div>
                 </label>
 
-                <div class="topbar-avatar" title="JS Education">JS</div>
+                {{-- User Dropdown --}}
+                <div class="user-menu-wrap" id="userMenuWrap">
+                    <div class="user-menu-trigger" onclick="toggleUserMenu()" id="userMenuTrigger">
+                        <div class="topbar-avatar" title="{{ Auth::user()->name }}">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', trim(Auth::user()->name))[1] ?? '', 0, 1)) }}
+                        </div>
+                        <span class="user-name d-none d-md-block">{{ Auth::user()->name }}</span>
+                        <svg class="chevron" width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                            <path d="M2 4l4 4 4-4"/>
+                        </svg>
+                    </div>
+
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-header">
+                            <div class="ud-name">{{ Auth::user()->name }}</div>
+                            <div class="ud-email">{{ Auth::user()->email }}</div>
+                        </div>
+
+                        <a href="{{ route('profile.edit') }}" class="ud-item">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 6a5 5 0 0110 0H3z"/>
+                            </svg>
+                            My Profile
+                        </a>
+
+                        <a href="{{ route('dashboard') }}" class="ud-item">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M2 2h5v5H2zm0 7h5v5H2zm7-7h5v5H9zm0 7h5v5H9z" opacity=".85"/>
+                            </svg>
+                            Dashboard
+                        </a>
+
+                        <div class="ud-divider"></div>
+
+                        <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                            @csrf
+                            <button type="submit" class="ud-item logout">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M7 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                </svg>
+                                Log Out
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -917,6 +1042,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // ─── User Dropdown ────────────────────────────
+        function toggleUserMenu() {
+            document.getElementById('userMenuWrap').classList.toggle('open');
+        }
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            const wrap = document.getElementById('userMenuWrap');
+            if (wrap && !wrap.contains(e.target)) {
+                wrap.classList.remove('open');
+            }
+        });
+
         // ─── Date in topbar ───────────────────────────────
         const dateEl = document.getElementById('currentDate');
         if (dateEl) {
