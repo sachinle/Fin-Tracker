@@ -16,8 +16,13 @@ WORKDIR /app
 # Copy project files
 COPY . .
 
+RUN apt-get update && apt-get install -y nodejs npm
+
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
+
+RUN npm install
+RUN npm run build
 
 # Generate key (optional fallback)
 RUN php artisan key:generate || true
